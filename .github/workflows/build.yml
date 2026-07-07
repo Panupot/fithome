@@ -1,4 +1,4 @@
-name: Build APK
+  name: Build APK
 
 on:
   push:
@@ -40,4 +40,14 @@ jobs:
         run: cp build/app/outputs/flutter-apk/app-release.apk fithome.apk
 
       - name: Upload APK artifact
-    
+        uses: actions/upload-artifact@v4
+        with:
+          name: fithome-apk
+          path: fithome.apk
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: FitHome build ${{ github.run_number }}
+          files: fithome.apk

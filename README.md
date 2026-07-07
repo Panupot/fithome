@@ -1,50 +1,48 @@
-#!/usr/bin/env python3
-"""Patch Flutter-generated Android files for flutter_local_notifications."""
-import re
+# FitHome — แอปออกกำลังกายที่บ้าน (Android)
 
-MANIFEST = "android/app/src/main/AndroidManifest.xml"
-GRADLE = "android/app/build.gradle"
+แอป Flutter ภาษาไทย/อังกฤษ: คลังท่า 56 ท่า, โปรแกรมฝึก 3 โปรแกรม, จับเวลา HIIT, บันทึกประวัติ, แจ้งเตือนรายวัน ข้อมูลทั้งหมดเก็บในเครื่อง ไม่ต้องใช้อินเทอร์เน็ต
 
-PERMISSIONS = """    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
-"""
+## วิธีสร้างไฟล์ APK (ผ่าน GitHub — ฟรี ไม่ต้องลงโปรแกรมอะไร)
 
-RECEIVERS = """        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
-        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
-                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
-            </intent-filter>
-        </receiver>
-"""
+### ขั้นที่ 1: สมัคร GitHub
+ไปที่ https://github.com แล้วสมัครบัญชี (ฟรี)
 
-with open(MANIFEST) as f:
-    m = f.read()
+### ขั้นที่ 2: สร้าง Repository
+1. กดปุ่ม **+** มุมขวาบน → **New repository**
+2. ตั้งชื่อ เช่น `fithome` (Public หรือ Private ก็ได้)
+3. กด **Create repository**
 
-# Add permissions right after the opening <manifest ...> tag
-m = re.sub(r"(<manifest[^>]*>\n)", r"\1" + PERMISSIONS, m, count=1)
-# Add notification receivers before </application>
-m = m.replace("</application>", RECEIVERS + "    </application>")
-# Set app display name
-m = re.sub(r'android:label="[^"]*"', 'android:label="FitHome"', m, count=1)
+### ขั้นที่ 3: อัปโหลดไฟล์
+1. ในหน้า repository กดลิงก์ **uploading an existing file**
+2. แตกไฟล์ zip ที่ได้รับ แล้วเปิดเข้าไป **ในโฟลเดอร์ fithome**
+3. ลาก **ทุกอย่างที่อยู่ข้างใน** ไปวางในหน้าเว็บ ได้แก่:
+   - โฟลเดอร์ `lib`
+   - โฟลเดอร์ `tool`
+   - โฟลเดอร์ `.github`  ← **สำคัญมาก ห้ามลืม** (ถ้าไม่เห็น ให้เปิด "แสดงไฟล์ที่ซ่อน" ใน File Explorer)
+   - ไฟล์ `pubspec.yaml`, `README.md`, `.gitignore`
+   > ⚠️ ลาก "สิ่งที่อยู่ข้างใน" โฟลเดอร์ fithome ไม่ใช่ลากตัวโฟลเดอร์ fithome ทั้งก้อน
+   > แนะนำใช้เบราว์เซอร์ Chrome หรือ Edge (รองรับการลากทั้งโฟลเดอร์)
+4. กด **Commit changes** ด้านล่าง
 
-with open(MANIFEST, "w") as f:
-    f.write(m)
-print("Patched", MANIFEST)
+### ขั้นที่ 4: รอ build
+1. ไปที่แท็บ **Actions** ด้านบนของ repository (ถ้ามีปุ่มให้เปิดใช้งาน ให้กด enable ก่อน)
+2. จะเห็นงานชื่อ **Build APK** กำลังรัน (วงกลมเหลือง) รอประมาณ 5–10 นาทีจนเป็น ✅ เขียว
+3. เมื่อเสร็จ ระบบจะสร้าง **Release** พร้อมไฟล์ `fithome.apk` ให้อัตโนมัติ
 
-with open(GRADLE) as f:
-    g = f.read()
+### ขั้นที่ 5: ติดตั้งลงมือถือ (แบบง่ายสุด — เปิดลิงก์ในมือถือ)
+> วิธีนี้ repository ต้องเป็น **Public**
+1. ในมือถือ เปิดเบราว์เซอร์ไปที่: `https://github.com/ชื่อผู้ใช้ของคุณ/fithome/releases/latest`
+   (หรือสแกน QR code ที่ Claude ทำให้)
+2. แตะไฟล์ **fithome.apk** เพื่อดาวน์โหลด
+3. เปิดไฟล์ที่โหลดมา → ถ้าเครื่องถาม ให้อนุญาต **"ติดตั้งแอปจากแหล่งที่ไม่รู้จัก"** → ติดตั้ง
+4. เปิดแอป FitHome ได้เลย 💪
 
-# Enable core library desugaring (required by flutter_local_notifications)
-g = g.replace(
-    "compileOptions {",
-    "compileOptions {\n        coreLibraryDesugaringEnabled true",
-    1,
-)
-g += "\ndependencies {\n    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'\n}\n"
+ถ้าไม่อยากเปิด Public ก็โหลด APK จากหัวข้อ **Artifacts** ในหน้า Actions (ต้องล็อกอิน GitHub) แล้วส่งไฟล์เข้ามือถือเอง
 
-with open(GRADLE, "w") as f:
-    f.write(g)
-print("Patched", GRADLE)
+## ถ้า build ไม่ผ่าน (❌ แดง)
+คลิกเข้าไปดู log ในงานที่ล้มเหลว คัดลอกข้อความ error ส่งกลับมาให้ Claude ช่วยแก้ได้
+
+## โครงสร้างโปรเจกต์
+- `lib/main.dart` — UI ทั้ง 5 หน้า (คลังท่า / โปรแกรม / จับเวลา / ประวัติ / ตั้งค่า)
+- `lib/data/exercises.dart` — ท่าออกกำลังกาย 56 ท่า
+- `lib/data/programs.dart` —

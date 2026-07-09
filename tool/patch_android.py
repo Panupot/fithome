@@ -37,19 +37,17 @@ print("Patched", MANIFEST)
 with open(GRADLE) as f:
     g = f.read()
 
-# Enable core library desugaring (required by flutter_local_notifications)
-g = g.replace(
-    "compileOptions {",
-    "compileOptions {\n        coreLibraryDesugaringEnabled true",
-    1,
-)
+# Raise minSdk to 26 (Android 8.0) so java.time is native.
+# This removes the need for core library desugaring, which avoids the
+# R8/L8 "This is not a JSON Array" build failure entirely.
+g = re.sub(r"minSdk(Version)?\s*=?\s*flutter\.minSdkVersion", "minSdkVersion 26", g)
+
 # Skip lint during release builds so CI lint checks don't block the APK
 g = g.replace(
     "android {",
     "android {\n    lint {\n        checkReleaseBuilds false\n        abortOnError false\n    }",
     1,
 )
-g += "\ndependencies {\n    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'\n}\n"
 
 with open(GRADLE, "w") as f:
     f.write(g)

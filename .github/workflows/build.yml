@@ -34,7 +34,7 @@ jobs:
         run: flutter pub get
 
       - name: Build release APK
-        run: flutter build apk --release
+        run: flutter build apk --release --no-shrink
 
       - name: Rename APK
         run: cp build/app/outputs/flutter-apk/app-release.apk fithome.apk

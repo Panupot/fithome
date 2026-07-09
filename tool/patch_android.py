@@ -49,7 +49,7 @@ g = g.replace(
     "android {\n    lint {\n        checkReleaseBuilds false\n        abortOnError false\n    }",
     1,
 )
-g += "\ndependencies {\n    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'\n}\n"
+g += "\ndependencies {\n    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'\n}\n"
 
 with open(GRADLE, "w") as f:
     f.write(g)
